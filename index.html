@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Sudoku Solver</title>
+      <style>
+         body {
+         font-family: Arial, sans-serif;
+         text-align: center;
+         margin: 50px;
+         }
+         table {
+         border-collapse: collapse;
+         margin: 20px auto;
+         }
+         table, th, td {
+         border: 1px solid black;
+         }
+         th, td {
+         width: 40px;
+         height: 40px;
+         text-align: center;
+         }
+         input {
+         width: 30px;
+         height: 30px;
+         text-align: center;
+         font-size: 16px;
+         }
+         button {
+         padding: 10px;
+         font-size: 16px;
+         cursor: pointer;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>Sudoku Solver</h1>
+      <table id="sudokuBoard">
+         <!-- Sudoku board will be dynamically generated here -->
+      </table>
+      <button onclick="solveSudoku()">Solve Sudoku</button>
+      <button onclick="resetBoard()">Reset</button>
+      <script>
+         // Your Sudoku solving logic goes here (similar to the previous JavaScript code)
+         
+         function resetBoard() {
+             const table = document.getElementById("sudokuBoard");
+         
+             for (let i = 0; i < 6; i++) {
+                 for (let j = 0; j < 6; j++) {
+                     const input = table.rows[i].cells[j].querySelector("input");
+                     input.value = "";
+                 }
+             }
+         }
+         
+         function solveSudokuRecursive(board) {
+         if (!isValid(board)) {
+         return false;
+         }
+         
+         const emptyCell = findEmptyCell(board);
+         if (!emptyCell) {
+         return true; // 所有空格已经填满
+         }
+         
+         const [row, col] = emptyCell;
+         
+         for (let num = 1; num <= 6; num++) {
+         if (isSafe(board, row, col, num)) {
+             board[row][col] = num;
+         
+             if (solveSudokuRecursive(board)) {
+                 return true;
+             }
+         
+             board[row][col] = 0; // 回溯
+         }
+         }
+         
+         return false; // 无解
+         }
+         
+         function isValid(board) {
+         // 检查整个数独是否合法
+         // 可以根据实际需求添加其他检查
+         return true;
+         }
+         
+         function findEmptyCell(board) {
+         // 找到第一个空格的位置
+         for (let i = 0; i < 6; i++) {
+         for (let j = 0; j < 6; j++) {
+             if (board[i][j] === 0) {
+                 return [i, j];
+             }
+         }
+         }
+         return null; // 数独已解决
+         }
+         
+         function isSafe(board, row, col, num) {
+         // 检查在给定位置放置数字是否安全
+         return (
+         isRowSafe(board, row, num) &&
+         isColSafe(board, col, num) &&
+         // isBoxSafe(board, row - row % 2, col - col % 3, num) &&
+         // isVerticalBoxSafe(board, row - row % 3, col - col % 2, num) &&
+         isDiagonalSafe(board, row, col, num)
+         );
+         }
+         
+         function isRowSafe(board, row, num) {
+         // 检查行是否安全
+         return !board[row].includes(num);
+         }
+         
+         function isColSafe(board, col, num) {
+         // 检查列是否安全
+         for (let i = 0; i < 6; i++) {
+         if (board[i][col] === num) {
+             return false;
+         }
+         }
+         return true;
+         }
+         
+         function isBoxSafe(board, startRow, startCol, num) {
+         // 检查3x2的盒子是否安全
+         for (let i = 0; i < 2; i++) {
+         for (let j = 0; j < 3; j++) {
+             if (board[startRow + i][startCol + j] === num) {
+                 return false;
+             }
+         }
+         }
+         return true;
+         }
+         function isVerticalBoxSafe(board, startRow, startCol, num) {
+         // 检查2x3的盒子是否安全
+         for (let i = 0; i < 3; i++) {
+         for (let j = 0; j < 2; j++) {
+             if (board[startRow + i][startCol + j] === num) {
+                 return false;
+             }
+         }
+         }
+         return true;
+         }
+         
+         function isDiagonalSafe(board, row, col, num) {
+         // 检查对角线是否安全
+         if (row === col) {
+         for (let i = 0; i < 6; i++) {
+             if (i !== row && board[i][i] === num) {
+                 return false;
+             }
+         }
+         }
+         if (row + col === 5) {
+         for (let i = 0; i < 6; i++) {
+             if (i !== row && board[i][5 - i] === num) {
+                 return false;
+             }
+         }
+         }
+         return true;
+         }
+         
+         
+         // Function to generate the Sudoku board UI
+         function generateBoardUI(board) {
+             const table = document.getElementById("sudokuBoard");
+             table.innerHTML = "";
+         
+             for (let i = 0; i < 6; i++) {
+                 const row = document.createElement("tr");
+                 for (let j = 0; j < 6; j++) {
+                     const cell = document.createElement("td");
+                     const input = document.createElement("input");
+                     input.type = "number";
+                     input.min = "1";
+                     input.max = "6";
+                     input.value = board[i][j] !== 0 ? board[i][j] : "";
+                     cell.appendChild(input);
+                     row.appendChild(cell);
+                 }
+                 table.appendChild(row);
+             }
+         }
+         
+         // Function to read the Sudoku board from the UI
+         function readBoardFromUI() {
+             const board = [];
+             const table = document.getElementById("sudokuBoard");
+         
+             for (let i = 0; i < 6; i++) {
+                 const row = [];
+                 for (let j = 0; j < 6; j++) {
+                     const input = table.rows[i].cells[j].querySelector("input");
+                     row.push(input.value !== "" ? parseInt(input.value, 10) : 0);
+                 }
+                 board.push(row);
+             }
+         
+             return board;
+         }
+         
+         // Function to solve Sudoku and update the UI
+         function solveSudoku() {
+             const board = readBoardFromUI();
+             if (solveSudokuRecursive(board)) {
+                 generateBoardUI(board);
+                 alert("Sudoku solved!");
+             } else {
+                 alert("No solution found!");
+             }
+         }
+         
+         // Initial board (you can modify this or allow users to input their own puzzles)
+         const initialBoard = [
+             [0, 0, 4, 0, 0, 0],
+             [2, 0, 0, 0, 0, 0],
+             [0, 0, 0, 5, 0, 0],
+             [0, 0, 0, 0, 0, 0],
+             [0, 6, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0],
+         ];
+         
+         // Initialize the UI with the initial board
+         generateBoardUI(initialBoard);
+      </script>
+   </body>
+</html>
