@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Sudoku Solver</title>
+      <title>Xixi de zuoye</title>
       <style>
          body {
          font-family: Arial, sans-serif;
@@ -106,7 +106,7 @@
          return (
          isRowSafe(board, row, num) &&
          isColSafe(board, col, num) &&
-         // isBoxSafe(board, row - row % 2, col - col % 3, num) &&
+         isBoxSafe(board, row - row % 2, col - col % 3, num) &&
          // isVerticalBoxSafe(board, row - row % 3, col - col % 2, num) &&
          isDiagonalSafe(board, row, col, num)
          );
